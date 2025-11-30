@@ -1,0 +1,1103 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Mittelalter Boss Interface</title>
+
+<!-- Mittelalter-Font (optional, braucht Internet) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --parchment: #e3d1a3;
+        --wood: #4b3319;
+        --shadow-deep: 0 10px 30px rgba(0,0,0,0.6);
+        --gold: #e4c76a;
+        --gold-dark: #9b7a26;
+        --green-soft: #d8f2d0;
+        --green-strong: #4a8b3c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        padding: 30px;
+        background: radial-gradient(circle at top, #7f5b36 0, #2b1a10 45%, #130a05 100%);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI",sans-serif;
+        color: #22140a;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .card {
+        width: 1100px;
+        max-width: 100%;
+        background: linear-gradient(135deg, #f5e3bd 0%, #e3d1a3 45%, #f1d9aa 100%);
+        border-radius: 18px;
+        padding: 24px 28px 40px;
+        box-shadow: var(--shadow-deep);
+        position: relative;
+        border: 10px solid #583a1b;
+        outline: 2px solid #c19a5a;
+    }
+
+    .card::before,
+    .card::after {
+        content: "";
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        height: 8px;
+        background: repeating-linear-gradient(
+            to right,
+            #7d542b 0,
+            #7d542b 10px,
+            #4a3016 10px,
+            #4a3016 20px
+        );
+        opacity: 0.5;
+    }
+    .card::before { top: 12px; }
+    .card::after  { bottom: 12px; }
+
+    h1 {
+        margin: 0 0 10px;
+        font-family: "Cinzel", serif;
+        font-weight: 800;
+        font-size: 32px;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 0 #fdf5e3, 0 3px 3px rgba(0,0,0,0.4);
+    }
+
+    .subtitle {
+        font-family: "Cinzel", serif;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        color: #4d341a;
+        margin-bottom: 18px;
+    }
+
+    .headerRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        gap: 20px;
+    }
+
+    .bossInfo {
+        font-size: 15px;
+        line-height: 1.5;
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.45);
+        border-radius: 10px;
+        border: 1px solid rgba(90,60,30,0.4);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15) inset;
+    }
+
+    .section {
+        margin-top: 18px;
+        padding: 12px 14px 16px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(238,214,166,0.95));
+        border: 1px solid rgba(90,60,30,0.45);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        position: relative;
+    }
+
+    .section:not(:last-of-type) { margin-bottom: 12px; }
+
+    .section h2 {
+        margin: 0 0 8px;
+        font-family: "Cinzel", serif;
+        font-size: 20px;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .icon-sword  { background: linear-gradient(135deg, #c23b2b, #7d1510); }
+    .icon-shield { background: linear-gradient(135deg, #3a5f96, #1d3559); }
+    .icon-heart  { background: linear-gradient(135deg, #b3263b, #6d1423); }
+    .icon-coin   { background: linear-gradient(135deg, #d3aa3b, #7f5b1c); }
+
+    .statRow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 6px;
+        flex-wrap: wrap;
+    }
+
+    .label {
+        min-width: 140px;
+        font-weight: 600;
+        color: #4a2f16;
+    }
+
+    .valueBox {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 70px;
+        padding: 6px 10px;
+        margin-left: 4px;
+        background: #fdfdfd;
+        border-radius: 999px;
+        border: 2px solid rgba(140,94,42,0.7);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+        font-size: 20px;
+        font-weight: 700;
+        color: #111;
+    }
+    .valueBox.small {
+        min-width: 60px;
+        font-size: 18px;
+    }
+
+    .arrowButtons {
+        display: inline-flex;
+        flex-direction: column;
+        margin-left: 6px;
+        gap: 4px;
+    }
+
+    .arrowButtons button,
+    .levelButtons button {
+        border-radius: 6px;
+        border: 1px solid #5e4628;
+        background: radial-gradient(circle at top, #fefefe 0, #c9b48b 60%, #8c6a3d 100%);
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 16px;
+        padding: 0 6px;
+        color: #251408;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+        box-shadow: 0 2px 3px rgba(0,0,0,0.35);
+        user-select: none;
+        height: 22px;
+        min-width: 24px;
+    }
+
+    .arrowButtons button {
+        width: 28px;
+        height: 20px;
+    }
+
+    .arrowButtons button:hover,
+    .levelButtons button:hover { filter: brightness(1.05); }
+    .arrowButtons button:active,
+    .levelButtons button:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+    }
+
+    .levelButtons {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 6px;
+    }
+
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 380px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #b88b4a, #e7c87f);
+        outline: none;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.35);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #fff 0, #f5e4bd 40%, #a67535 100%);
+        border: 1px solid #5b3a1d;
+        box-shadow: 0 0 0 2px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.6);
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #fff 0, #f5e4bd 40%, #a67535 100%);
+        border: 1px solid #5b3a1d;
+        box-shadow: 0 0 0 2px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.6);
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-track {
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #b88b4a, #e7c87f);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.35);
+    }
+
+    .heartsRow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+    .hearts { display: flex; gap: 14px; }
+
+    .heart {
+        width: 48px;
+        height: 48px;
+        background: url('https://i.imgur.com/qs9xE8m.png') no-repeat center;
+        background-size: contain;
+        cursor: pointer;
+    }
+    .hiddenHeart {
+        opacity: 0.18;
+        filter: grayscale(100%);
+    }
+    .explode { animation: heart-pop 0.35s forwards; }
+    @keyframes heart-pop {
+        0%   { transform: scale(1);   opacity: 1; }
+        40%  { transform: scale(1.4); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.15; }
+    }
+    .heal { animation: heart-heal 0.35s forwards; }
+    @keyframes heart-heal {
+        0%   { transform: scale(0.8); opacity: 0.3; }
+        50%  { transform: scale(1.45); opacity: 1; }
+        100% { transform: scale(1);   opacity: 1; }
+    }
+
+    .livesText {
+        font-weight: 600;
+        color: #4a2415;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.7);
+        border: 1px solid rgba(120,70,30,0.7);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .weaponRow {
+        display: flex;
+        gap: 18px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .weaponStats {
+        flex: 1;
+        min-width: 260px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .weaponBlock {
+        flex: 1 1 260px;
+        background: rgba(255,255,255,0.8);
+        border-radius: 12px;
+        border: 1px solid rgba(90,60,30,0.5);
+        padding: 10px 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .weaponTitle {
+        font-family: "Cinzel", serif;
+        font-weight: 700;
+        margin-bottom: 6px;
+        font-size: 17px;
+        color: #3b2614;
+    }
+
+    .weaponStatRow {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+    }
+
+    .weaponLabel {
+        min-width: 120px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a2f16;
+    }
+
+    .weaponHint {
+        font-size: 12px;
+        color: #5a3c22;
+        margin-top: 4px;
+    }
+
+    /* Level-Anzeige (Punkte) */
+    .levelDots {
+        display: inline-flex;
+        gap: 4px;
+        margin-left: 8px;
+    }
+    .levelDot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1px solid rgba(80,60,30,0.8);
+        background: rgba(255,255,255,0.6);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+    .levelDot.active {
+        background: radial-gradient(circle at 30% 30%, #fff 0, var(--gold) 45%, var(--gold-dark) 100%);
+        border-color: var(--gold-dark);
+        box-shadow: 0 0 4px rgba(255,230,150,0.9);
+    }
+
+    /* KÄUFE & VERBESSERUNGEN */
+    .upgradesContainer {
+        margin-top: 10px;
+    }
+
+    .upgradeGroups {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .upgradeGroup {
+        background: rgba(255,255,255,0.8);
+        border-radius: 12px;
+        border: 1px solid rgba(90,60,30,0.5);
+        padding: 8px 10px 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+
+    .upgradeGroupTitle {
+        font-family: "Cinzel", serif;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: #3b2614;
+    }
+
+    .upgradeItem {
+        margin-top: 4px;
+        padding: 6px 7px;
+        border-radius: 8px;
+        border: 1px solid rgba(130,90,40,0.4);
+        background: rgba(255,255,255,0.9);
+        cursor: pointer;
+        transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.08s ease, border-color 0.15s ease;
+    }
+
+    .upgradeItem:hover {
+        background: #f7f0d9;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        transform: translateY(-1px);
+    }
+
+    .upgradeItem.achieved {
+        background: var(--green-soft);
+        border-color: var(--green-strong);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25), 0 0 0 2px rgba(123,189,110,0.7);
+    }
+
+    .upgradeItemTitle {
+        font-size: 14px;
+        font-weight: 700;
+        color: #352213;
+    }
+
+    .upgradeItemDesc {
+        font-size: 12px;
+        color: #5a4330;
+        margin-top: 1px;
+    }
+
+    .upgradeHint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #5b4024;
+    }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <div class="headerRow">
+        <div>
+            <h1>König Lichtenberg</h1>
+            <div class="subtitle">Herrscher der alten Festung</div>
+            <div class="bossInfo">
+                <strong>Stärke:</strong> 5<br>
+                <strong>Leben:</strong> 3 Herzen, LP bis 200<br>
+                <strong>Verteidigung:</strong> 3<br>
+                <strong>Würfel:</strong> 2× 6-seitig
+            </div>
+        </div>
+    </div>
+
+    <!-- SCHADEN -->
+    <div class="section">
+        <h2><span class="icon icon-sword">⚔</span> Schaden</h2>
+        <div class="statRow">
+            <div class="label">Schaden (0–200):</div>
+            <input id="dmgSlider" type="range" min="0" max="200" value="0">
+            <div id="dmgValue" class="valueBox">0</div>
+            <div class="arrowButtons">
+                <button onclick="changeValue('dmg', 1)">▲</button>
+                <button onclick="changeValue('dmg', -1)">▼</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VERTEIDIGUNG -->
+    <div class="section">
+        <h2><span class="icon icon-shield">🛡</span> Verteidigung</h2>
+        <div class="statRow">
+            <div class="label">Verteidigung (0–200):</div>
+            <input id="defSlider" type="range" min="0" max="200" value="0">
+            <div id="defValue" class="valueBox">0</div>
+            <div class="arrowButtons">
+                <button onclick="changeValue('def', 1)">▲</button>
+                <button onclick="changeValue('def', -1)">▼</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEBENSPUNKTE -->
+    <div class="section">
+        <h2><span class="icon icon-heart">♥</span> Lebenspunkte</h2>
+        <div class="statRow">
+            <div class="label">LP (0–200):</div>
+            <input id="lpSlider" type="range" min="0" max="200" value="200">
+            <div id="lpValue" class="valueBox">200</div>
+            <div class="arrowButtons">
+                <button onclick="changeValue('lp', 1)">▲</button>
+                <button onclick="changeValue('lp', -1)">▼</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEBEN / HERZEN -->
+    <div class="section">
+        <h2><span class="icon icon-heart">❤</span> Leben (3 Herzen)</h2>
+        <div class="heartsRow">
+            <div class="hearts">
+                <div class="heart" data-index="0" title="Doppelklick: Leben verlieren / heilen"></div>
+                <div class="heart" data-index="1" title="Doppelklick: Leben verlieren / heilen"></div>
+                <div class="heart" data-index="2" title="Doppelklick: Leben verlieren / heilen"></div>
+            </div>
+            <div id="livesText" class="livesText">Leben: 3 / 3</div>
+        </div>
+        <small style="display:block;margin-top:6px;color:#6b4022;">
+            Doppelklick auf ein Herz = Leben entfernen oder wieder hinzufügen (max. 3).
+        </small>
+    </div>
+
+    <!-- 3 WAFFENANZEIGEN mit Level -->
+    <div class="section">
+        <h2><span class="icon icon-sword">⚔</span> Waffen</h2>
+        <div class="weaponRow">
+            <div class="weaponStats">
+
+                <!-- Waffe 1 -->
+                <div class="weaponBlock">
+                    <div class="weaponTitle">Waffe 1</div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Stärke:</span>
+                        <div id="w1AtkValue" class="valueBox small">5</div>
+                        <div class="arrowButtons">
+                            <button onclick="changeWeaponValue(1, 'atk', 1)">▲</button>
+                            <button onclick="changeWeaponValue(1, 'atk', -1)">▼</button>
+                        </div>
+                    </div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Verteidigung:</span>
+                        <div id="w1DefValue" class="valueBox small">3</div>
+                        <div class="arrowButtons">
+                            <button onclick="changeWeaponValue(1, 'def', 1)">▲</button>
+                            <button onclick="changeWeaponValue(1, 'def', -1)">▼</button>
+                        </div>
+                    </div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Level:</span>
+                        <div class="levelButtons">
+                            <button onclick="changeWeaponLevel(1, -1)">−</button>
+                            <div id="w1LevelText" class="valueBox small">1</div>
+                            <button onclick="changeWeaponLevel(1, 1)">+</button>
+                        </div>
+                        <div class="levelDots" id="w1LevelDots">
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Waffe 2 -->
+                <div class="weaponBlock">
+                    <div class="weaponTitle">Waffe 2</div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Stärke:</span>
+                        <div id="w2AtkValue" class="valueBox small">5</div>
+                        <div class="arrowButtons">
+                            <button onclick="changeWeaponValue(2, 'atk', 1)">▲</button>
+                            <button onclick="changeWeaponValue(2, 'atk', -1)">▼</button>
+                        </div>
+                    </div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Verteidigung:</span>
+                        <div id="w2DefValue" class="valueBox small">3</div>
+                        <div class="arrowButtons">
+                            <button onclick="changeWeaponValue(2, 'def', 1)">▲</button>
+                            <button onclick="changeWeaponValue(2, 'def', -1)">▼</button>
+                        </div>
+                    </div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Level:</span>
+                        <div class="levelButtons">
+                            <button onclick="changeWeaponLevel(2, -1)">−</button>
+                            <div id="w2LevelText" class="valueBox small">1</div>
+                            <button onclick="changeWeaponLevel(2, 1)">+</button>
+                        </div>
+                        <div class="levelDots" id="w2LevelDots">
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Waffe 3 -->
+                <div class="weaponBlock">
+                    <div class="weaponTitle">Waffe 3</div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Stärke:</span>
+                        <div id="w3AtkValue" class="valueBox small">5</div>
+                        <div class="arrowButtons">
+                            <button onclick="changeWeaponValue(3, 'atk', 1)">▲</button>
+                            <button onclick="changeWeaponValue(3, 'atk', -1)">▼</button>
+                        </div>
+                    </div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Verteidigung:</span>
+                        <div id="w3DefValue" class="valueBox small">3</div>
+                        <div class="arrowButtons">
+                            <button onclick="changeWeaponValue(3, 'def', 1)">▲</button>
+                            <button onclick="changeWeaponValue(3, 'def', -1)">▼</button>
+                        </div>
+                    </div>
+                    <div class="weaponStatRow">
+                        <span class="weaponLabel">Level:</span>
+                        <div class="levelButtons">
+                            <button onclick="changeWeaponLevel(3, -1)">−</button>
+                            <div id="w3LevelText" class="valueBox small">1</div>
+                            <button onclick="changeWeaponLevel(3, 1)">+</button>
+                        </div>
+                        <div class="levelDots" id="w3LevelDots">
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                            <span class="levelDot"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="weaponHint">
+            Level: 1–6. Punkte zeigen das aktuelle Level an (gold = aktiv). Level kannst du mit deinen Upgrade-Regeln verknüpfen.
+        </div>
+    </div>
+
+    <!-- KÄUFE & VERBESSERUNGEN -->
+    <div class="section upgradesContainer">
+        <h2><span class="icon icon-coin">◎</span> Käufe & Verbesserungen</h2>
+        <div class="upgradeGroups">
+
+            <!-- Gruppe: Handkarten -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Handkarten</div>
+
+                <div class="upgradeItem" data-upgrade-id="hand_5">
+                    <div class="upgradeItemTitle">5 Karten</div>
+                    <div class="upgradeItemDesc">Grundausrüstung · Stadt · Start im Wald</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="hand_7">
+                    <div class="upgradeItemTitle">7 Karten</div>
+                    <div class="upgradeItemDesc">Kosten: 5 Karten · Stadt · früher Ausbau</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="hand_9">
+                    <div class="upgradeItemTitle">9 Karten</div>
+                    <div class="upgradeItemDesc">Kosten: 2 Mana + 2 Kristalle · Stadt · Magie freigeschaltet</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="hand_11">
+                    <div class="upgradeItemTitle">11 Karten</div>
+                    <div class="upgradeItemDesc">Kosten: 7 Rohstoffe + Schriftrolle · Stadt · Voraussetzung Wüste</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Waffengürtel -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Waffengürtel</div>
+
+                <div class="upgradeItem" data-upgrade-id="belt_1">
+                    <div class="upgradeItemTitle">Waffengürtel LVL 1</div>
+                    <div class="upgradeItemDesc">1 Platz · Kosten: 2 Stein, 2 Holz · Schmiede</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="belt_2">
+                    <div class="upgradeItemTitle">Waffengürtel LVL 2</div>
+                    <div class="upgradeItemDesc">2 Plätze · Kosten: 2 Bambus, 2 Holz, 2 Stein · Schmiede</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="belt_3">
+                    <div class="upgradeItemTitle">Waffengürtel LVL 3</div>
+                    <div class="upgradeItemDesc">3 Plätze · Kosten: 2 Bambus, 2 Mana, 2 Kristall, 2 Stein · Schmiede</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Waffenverbesserung -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Waffenverbesserung</div>
+
+                <div class="upgradeItem" data-upgrade-id="weapon_light">
+                    <div class="upgradeItemTitle">Leicht</div>
+                    <div class="upgradeItemDesc">Kosten: Grundausrüstung · Würfel: Grundausrüstung · Schmiede · ab Wald</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="weapon_medium">
+                    <div class="upgradeItemTitle">Mittel</div>
+                    <div class="upgradeItemDesc">Kosten: 5 Rohstoffe · Erfolg: 2–6 · Schmiede · ab Wald</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="weapon_heavy">
+                    <div class="upgradeItemTitle">Schwer</div>
+                    <div class="upgradeItemDesc">Kosten: 6 Rohstoffe · Erfolg: 4–6 · Schmiede · ab 7 Handkarten (Dschungel)</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="weapon_epic">
+                    <div class="upgradeItemTitle">Episch</div>
+                    <div class="upgradeItemDesc">Kosten: 7 Rohstoffe · Erfolg: 5–6 · Schmiede · 7 Handkarten Magie</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="weapon_legendary">
+                    <div class="upgradeItemTitle">Legendär</div>
+                    <div class="upgradeItemDesc">Kosten: 5 Rohstoffe + 1 mittlere Waffe · Erfolg: 6 · Schmiede · 11 Handkarten Wüste</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Stadt -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Stadt</div>
+
+                <div class="upgradeItem" data-upgrade-id="city_1">
+                    <div class="upgradeItemTitle">Stadt LVL 1</div>
+                    <div class="upgradeItemDesc">Kosten: 10 Rohstoffe nach Wahl · Freischaltet: 10 ATK / 10 DEF · Lager LVL 1</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="city_2">
+                    <div class="upgradeItemTitle">Stadt LVL 2</div>
+                    <div class="upgradeItemDesc">Kosten: 20 Rohstoffe nach Wahl · Freischaltet: 20 ATK / 20 DEF</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="city_3">
+                    <div class="upgradeItemTitle">Stadt LVL 3</div>
+                    <div class="upgradeItemDesc">Kosten: 35 Rohstoffe + 3 Öl · Freischaltet: 30 ATK / 30 DEF</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Lager -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Lager</div>
+
+                <div class="upgradeItem" data-upgrade-id="storage_1">
+                    <div class="upgradeItemTitle">Lager LVL 1</div>
+                    <div class="upgradeItemDesc">Kosten: 5 Rohstoffe · 10 Lagerplätze · von Anfang an verfügbar</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="storage_2">
+                    <div class="upgradeItemTitle">Lager LVL 2</div>
+                    <div class="upgradeItemDesc">Kosten: 17 Rohstoffe · 15 Plätze · Tausch zwischen Spielern möglich · ab 7 Handkarten</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="storage_3">
+                    <div class="upgradeItemTitle">Lager LVL 3</div>
+                    <div class="upgradeItemDesc">Kosten: 20 Rohstoffe + 2 Öl · 20 Plätze · jede Runde 1 Rohstoffkarte nach Wahl · Öl-Voraussetzung</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Magierturm -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Magierturm (in der Stadt)</div>
+
+                <div class="upgradeItem" data-upgrade-id="tower_1">
+                    <div class="upgradeItemTitle">Magierturm LVL 1</div>
+                    <div class="upgradeItemDesc">Kosten: 10 Rohstoffe · Funktion: Würfel kaufen · ab Anfang der Stadt</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="tower_2">
+                    <div class="upgradeItemTitle">Magierturm LVL 2</div>
+                    <div class="upgradeItemDesc">Kosten: 20 Rohstoffe · +10 Magie-Angriff · Voraussetzung: Lager LVL 2</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="tower_3">
+                    <div class="upgradeItemTitle">Magierturm LVL 3</div>
+                    <div class="upgradeItemDesc">Kosten: 5 Öl, 5 Magie, 5 Kristalle · +1 Bewegungswürfel · Voraussetzung: Wüste</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Würfelverbesserung -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Würfelverbesserung</div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_d4">
+                    <div class="upgradeItemTitle">W4</div>
+                    <div class="upgradeItemDesc">Bewegung & Kampf · Bonus: zusätzlich · Kosten: 3 Rohstoffe · Voraussetzung: Magierturm LVL 1</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_d6">
+                    <div class="upgradeItemTitle">W6</div>
+                    <div class="upgradeItemDesc">Bewegung & Kampf · Bis zu 5 Würfel · Kosten: 10 Rohstoffe</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_d8">
+                    <div class="upgradeItemTitle">W8</div>
+                    <div class="upgradeItemDesc">Bewegung & Kampf · Waffenverbesserung zusätzlich · Kosten: 7 Rohstoffe</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_d10">
+                    <div class="upgradeItemTitle">W10</div>
+                    <div class="upgradeItemDesc">Bewegung & Kampf · zusätzlicher Effekt · Kosten: 15 Karten</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_d12">
+                    <div class="upgradeItemTitle">W12</div>
+                    <div class="upgradeItemDesc">Bewegung & Kampf · Tauschen möglich · Kosten: 10 Karten</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_d20">
+                    <div class="upgradeItemTitle">W20</div>
+                    <div class="upgradeItemDesc">Bewegung & Kampf · alle Rohstoffe 1× + 1 Waffe LVL 2 · hoher Kostenpunkt</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="dice_10_100">
+                    <div class="upgradeItemTitle">W10–100 Heilwürfel</div>
+                    <div class="upgradeItemDesc">Heilt Lebenspunkte · Kosten: 5 Heilkraut</div>
+                </div>
+            </div>
+
+            <!-- Gruppe: Bogenschütze -->
+            <div class="upgradeGroup">
+                <div class="upgradeGroupTitle">Bogenschütze</div>
+
+                <div class="upgradeItem" data-upgrade-id="bow_1">
+                    <div class="upgradeItemTitle">Bogenschütze LVL 1</div>
+                    <div class="upgradeItemDesc">Kosten: 2 Bambus · Schmiede · Reichweite +1 · Belohnung: Dschungel</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="bow_2">
+                    <div class="upgradeItemTitle">Bogenschütze LVL 2</div>
+                    <div class="upgradeItemDesc">Kosten: 2 Magie · Schmiede · Reichweite +2 · Belohnung: Magiegebiet</div>
+                </div>
+
+                <div class="upgradeItem" data-upgrade-id="bow_3">
+                    <div class="upgradeItemTitle">Bogenschütze LVL 3</div>
+                    <div class="upgradeItemDesc">Kosten: 2 Öl · Schmiede · Reichweite +3 · Belohnung: Wüste</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="upgradeHint">
+            Doppelklick auf einen Eintrag = gekauft / freigeschaltet (grün). Nochmals doppelklicken = wieder zurücksetzen. Alles wird pro Gerät gespeichert.
+        </div>
+    </div>
+
+</div>
+
+<script>
+const maxLives = 3;
+let heartsState = [1, 1, 1]; // 1 = Herz aktiv
+
+// --------- SLIDER & WERTE ---------
+const dmgSlider = document.getElementById("dmgSlider");
+const defSlider = document.getElementById("defSlider");
+const lpSlider  = document.getElementById("lpSlider");
+
+const dmgValue = document.getElementById("dmgValue");
+const defValue = document.getElementById("defValue");
+const lpValue  = document.getElementById("lpValue");
+
+function saveSliders() {
+    localStorage.setItem("boss_dmg", dmgSlider.value);
+    localStorage.setItem("boss_def", defSlider.value);
+    localStorage.setItem("boss_lp",  lpSlider.value);
+}
+
+function loadSliders() {
+    const sDmg = localStorage.getItem("boss_dmg");
+    const sDef = localStorage.getItem("boss_def");
+    const sLp  = localStorage.getItem("boss_lp");
+
+    if (sDmg !== null) dmgSlider.value = sDmg;
+    if (sDef !== null) defSlider.value = sDef;
+    if (sLp  !== null) lpSlider.value  = sLp;
+
+    dmgValue.textContent = dmgSlider.value;
+    defValue.textContent = defSlider.value;
+    lpValue.textContent  = lpSlider.value;
+}
+
+dmgSlider.oninput = function () {
+    dmgValue.textContent = this.value;
+    saveSliders();
+};
+defSlider.oninput = function () {
+    defValue.textContent = this.value;
+    saveSliders();
+};
+lpSlider.oninput = function () {
+    lpValue.textContent = this.value;
+    saveSliders();
+};
+
+function changeValue(type, amount) {
+    let slider, valueBox, storageKey;
+    if (type === "dmg") { slider = dmgSlider; valueBox = dmgValue; storageKey = "boss_dmg"; }
+    if (type === "def") { slider = defSlider; valueBox = defValue; storageKey = "boss_def"; }
+    if (type === "lp")  { slider = lpSlider;  valueBox = lpValue;  storageKey = "boss_lp"; }
+
+    let newValue = parseInt(slider.value) + amount;
+    newValue = Math.max(0, Math.min(200, newValue));
+
+    slider.value = newValue;
+    valueBox.textContent = newValue;
+    localStorage.setItem(storageKey, newValue);
+}
+
+// --------- HERZEN ---------
+const hearts = document.querySelectorAll(".heart");
+const livesText = document.getElementById("livesText");
+
+function calcLives() {
+    return heartsState.reduce((sum, v) => sum + (v ? 1 : 0), 0);
+}
+function updateLivesText() {
+    livesText.textContent = `Leben: ${calcLives()} / ${maxLives}`;
+}
+function updateHeartsDOM() {
+    hearts.forEach((heart, i) => {
+        if (heartsState[i]) heart.classList.remove("hiddenHeart");
+        else heart.classList.add("hiddenHeart");
+    });
+    updateLivesText();
+}
+function saveHearts() {
+    localStorage.setItem("boss_hearts", heartsState.join(","));
+}
+function loadHearts() {
+    const saved = localStorage.getItem("boss_hearts");
+    if (saved) heartsState = saved.split(",").map(v => v === "1");
+    else heartsState = [1,1,1];
+    updateHeartsDOM();
+}
+function toggleHeart(i) {
+    let lives = calcLives();
+    if (heartsState[i]) {
+        if (lives <= 0) return;
+        heartsState[i] = 0;
+        hearts[i].classList.remove("heal");
+        hearts[i].classList.add("explode");
+    } else {
+        if (lives >= maxLives) return;
+        heartsState[i] = 1;
+        hearts[i].classList.remove("explode","hiddenHeart");
+        hearts[i].classList.add("heal");
+    }
+    saveHearts();
+    updateLivesText();
+}
+hearts.forEach(heart => {
+    heart.addEventListener("dblclick", () => {
+        const index = parseInt(heart.getAttribute("data-index"), 10);
+        toggleHeart(index);
+    });
+    heart.addEventListener("animationend", (e) => {
+        if (e.animationName === "heart-pop") {
+            heart.classList.remove("explode");
+            heart.classList.add("hiddenHeart");
+        }
+        if (e.animationName === "heart-heal") {
+            heart.classList.remove("heal");
+        }
+    });
+});
+
+// --------- 3 WAFFEN-WERTE + LEVEL ---------
+let weaponAtk   = [5, 5, 5];
+let weaponDef   = [3, 3, 3];
+let weaponLevel = [1, 1, 1];
+const maxWeapon = 20;
+const maxLevel  = 6;
+
+const w1AtkValue = document.getElementById("w1AtkValue");
+const w1DefValue = document.getElementById("w1DefValue");
+const w2AtkValue = document.getElementById("w2AtkValue");
+const w2DefValue = document.getElementById("w2DefValue");
+const w3AtkValue = document.getElementById("w3AtkValue");
+const w3DefValue = document.getElementById("w3DefValue");
+
+const w1LevelText = document.getElementById("w1LevelText");
+const w2LevelText = document.getElementById("w2LevelText");
+const w3LevelText = document.getElementById("w3LevelText");
+
+const w1LevelDots = document.querySelectorAll("#w1LevelDots .levelDot");
+const w2LevelDots = document.querySelectorAll("#w2LevelDots .levelDot");
+const w3LevelDots = document.querySelectorAll("#w3LevelDots .levelDot");
+
+function saveWeapon() {
+    for (let i = 0; i < 3; i++) {
+        const slot = i + 1;
+        localStorage.setItem(`weapon${slot}_atk`, weaponAtk[i].toString());
+        localStorage.setItem(`weapon${slot}_def`, weaponDef[i].toString());
+        localStorage.setItem(`weapon${slot}_lvl`, weaponLevel[i].toString());
+    }
+}
+
+function updateWeaponUI() {
+    w1AtkValue.textContent = weaponAtk[0];
+    w1DefValue.textContent = weaponDef[0];
+    w2AtkValue.textContent = weaponAtk[1];
+    w2DefValue.textContent = weaponDef[1];
+    w3AtkValue.textContent = weaponAtk[2];
+    w3DefValue.textContent = weaponDef[2];
+
+    w1LevelText.textContent = weaponLevel[0];
+    w2LevelText.textContent = weaponLevel[1];
+    w3LevelText.textContent = weaponLevel[2];
+
+    [w1LevelDots, w2LevelDots, w3LevelDots].forEach((dots, index) => {
+        const lvl = weaponLevel[index];
+        dots.forEach((dot, i) => {
+            if (i < lvl) dot.classList.add("active");
+            else dot.classList.remove("active");
+        });
+    });
+}
+
+function loadWeapon() {
+    for (let i = 0; i < 3; i++) {
+        const slot = i + 1;
+        const sAtk = localStorage.getItem(`weapon${slot}_atk`);
+        const sDef = localStorage.getItem(`weapon${slot}_def`);
+        const sLvl = localStorage.getItem(`weapon${slot}_lvl`);
+        if (sAtk !== null) weaponAtk[i]   = parseInt(sAtk);
+        if (sDef !== null) weaponDef[i]   = parseInt(sDef);
+        if (sLvl !== null) weaponLevel[i] = Math.max(1, Math.min(maxLevel, parseInt(sLvl)));
+    }
+    updateWeaponUI();
+}
+
+function changeWeaponValue(slot, type, amount) {
+    const idx = slot - 1;
+    if (idx < 0 || idx > 2) return;
+
+    if (type === "atk") {
+        weaponAtk[idx] = Math.max(0, Math.min(maxWeapon, weaponAtk[idx] + amount));
+    } else if (type === "def") {
+        weaponDef[idx] = Math.max(0, Math.min(maxWeapon, weaponDef[idx] + amount));
+    }
+    updateWeaponUI();
+    saveWeapon();
+}
+
+function changeWeaponLevel(slot, delta) {
+    const idx = slot - 1;
+    if (idx < 0 || idx > 2) return;
+
+    let newLevel = weaponLevel[idx] + delta;
+    newLevel = Math.max(1, Math.min(maxLevel, newLevel));
+    weaponLevel[idx] = newLevel;
+
+    updateWeaponUI();
+    saveWeapon();
+}
+
+// --------- KÄUFE & VERBESSERUNGEN (Toggle per Doppelklick) ---------
+const upgradeItems = document.querySelectorAll(".upgradeItem");
+let upgradesState = {};
+
+function loadUpgrades() {
+    const saved = localStorage.getItem("upgrades_state");
+    if (saved) {
+        try {
+            upgradesState = JSON.parse(saved) || {};
+        } catch(e) {
+            upgradesState = {};
+        }
+    }
+    upgradeItems.forEach(item => {
+        const id = item.dataset.upgradeId;
+        if (id && upgradesState[id]) {
+            item.classList.add("achieved");
+        }
+    });
+}
+
+function saveUpgrades() {
+    localStorage.setItem("upgrades_state", JSON.stringify(upgradesState));
+}
+
+upgradeItems.forEach(item => {
+    item.addEventListener("dblclick", () => {
+        const id = item.dataset.upgradeId;
+        if (!id) return;
+        const nowActive = !item.classList.contains("achieved");
+        item.classList.toggle("achieved", nowActive);
+        upgradesState[id] = nowActive;
+        saveUpgrades();
+    });
+});
+
+// --------- INIT ---------
+window.addEventListener("DOMContentLoaded", () => {
+    loadSliders();
+    loadHearts();
+    loadWeapon();
+    loadUpgrades();
+});
+</script>
+
+</body>
+</html>
